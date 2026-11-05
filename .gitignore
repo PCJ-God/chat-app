@@ -1,0 +1,17 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+dist-ssr/
+*.local
+
+# 真实配置与密钥（不要提交；请参考 config/config.example.yaml）
+.env
+config/config.yaml
+
+# 日志与本地/编辑器文件
+*.log
+.DS_Store
+.vscode/
+.idea/

@@ -1,0 +1,32 @@
+# Docker 部署专用配置：容器内用服务名互联（mysql / redis）
+server:
+  port: 8080
+  mode: release
+  host: 0.0.0.0
+
+websocket:
+  read_buffer_size: 1024
+  write_buffer_size: 1024
+  handshake_timeout: 10s
+  ping_period: 54s
+  pong_wait: 60s
+  max_message_size: 512
+
+database:
+  driver: mysql
+  host: mysql
+  port: 3306
+  user: root
+  password: chat_app_pass
+  dbname: chat_db
+  charset: utf8mb4
+
+redis:
+  host: redis
+  port: 6379
+  password: ""
+  db: 0
+
+jwt:
+  secret: change-me-to-a-long-random-secret-before-production
+  expire: 24h

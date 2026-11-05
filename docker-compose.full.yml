@@ -1,0 +1,69 @@
+# 全栈生产部署编排：frontend(nginx) / backend(Go) / mysql / redis
+# 说明：
+#   - 本机 docker compose 的 bake 构建不可用，请先用 docker build 构建两个镜像：
+#       docker build -t chat-app-backend:local  -f Dockerfile .
+#       docker build -t chat-app-frontend:local -f frontend/Dockerfile frontend
+#     再执行：docker compose -f docker-compose.full.yml up -d --no-build
+#   - 正常环境也可直接用：docker compose -f docker-compose.full.yml up -d --build
+#   - mysql/redis 不映射宿主机端口，仅容器内通过服务名访问，避免与本机端口冲突
+#   - 后端配置由 config/config.docker.yaml 覆盖挂载（服务名 mysql/redis、host 0.0.0.0）
+#   - 访问 http://localhost:8099
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: chat_app_pass
+      MYSQL_DATABASE: chat_db
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pchat_app_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    image: chat-app-backend:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./config/config.docker.yaml:/app/config/config.yaml:ro
+
+  frontend:
+    image: chat-app-frontend:local
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8099:80"
+
+volumes:
+  mysql_data:
+  redis_data:

@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  mode: debug
+  host: localhost
+
+websocket:
+  read_buffer_size: 1024
+  write_buffer_size: 1024
+  handshake_timeout: 10s
+  ping_period: 54s
+  pong_wait: 60s
+  max_message_size: 512
+
+database:
+  driver: mysql
+  host: localhost
+  port: 3306
+  user: root
+  password: your_db_password
+  dbname: chat_db
+  charset: utf8mb4
+
+redis:
+  host: localhost
+  port: 6379
+  password: ""
+  db: 0
+
+jwt:
+  # 请替换为足够长的随机字符串
+  secret: your_jwt_secret_change_me
+  expire: 24h
