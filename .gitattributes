@@ -1,0 +1,10 @@
+# 统一换行：仓库内统一使用 LF，检出为 LF；二进制文件保持原样
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
